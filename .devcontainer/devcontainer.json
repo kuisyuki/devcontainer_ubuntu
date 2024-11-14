@@ -1,0 +1,26 @@
+{
+    "name": "Custom Ubuntu 24.04",
+    "dockerComposeFile": "../docker-compose.yml",
+    "service": "devcontainer",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-azuretools.vscode-docker",
+                "bmewburn.vscode-intelephense-client",
+                "felixfbecker.php-debug",
+                "onecentlin.laravel-blade",
+                "ryannaddy.laravel-artisan",
+                "amiralizadeh9480.laravel-extra-intellisense",
+                "mehedidracula.php-namespace-resolver",
+                "jeroeng.laravel-extension-pack"
+            ]
+        }
+    },
+    "mounts": [
+      "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+    ],
+    "remoteUser": "ubuntu",
+    "workspaceFolder": "/workspace/devcontainer_ubuntu",
+    "postCreateCommand": "/bin/sh postCreateCommand.sh",
+    "postStartCommand": "/bin/sh postStartCommand.sh"
+}
