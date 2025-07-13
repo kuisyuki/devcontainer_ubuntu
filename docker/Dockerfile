@@ -10,10 +10,13 @@ RUN ln -fs /usr/share/zoneinfo/Etc/UTC /etc/localtime && \
     apt-get install -y tzdata && \
     dpkg-reconfigure --frontend noninteractive tzdata
 
-# 必要なパッケージのインストール
+# 必要最低限のパッケージのインストール
 RUN apt-get update && \
     apt-get install -y \
-    jq sql-migrate apt-transport-https ca-certificates curl gnupg-agent software-properties-common sudo vim nano passwd zip unzip wget init systemd
+    apt-transport-https ca-certificates curl gnupg-agent software-properties-common \
+    sudo vim nano passwd zip unzip wget git \
+    build-essential python3 python3-pip && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Dockerの公開鍵の追加とリポジトリの設定
 RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - && \
@@ -21,31 +24,20 @@ RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - && \
 
 # Docker関連のパッケージのインストール
 RUN apt-get update && \
-    apt-get install -y docker-ce docker-compose
-
-# PHPと必要な拡張のインストール
-RUN apt-get install -y \
-    php php-cli php-fpm php-mbstring php-xml php-bcmath php-json php-mysql php-zip php-curl composer
+    apt-get install -y docker-ce docker-compose && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # アスキーアートスクリプトの追加
 COPY ../docker/motd.sh /etc/profile.d/motd.sh
 RUN chmod +x /etc/profile.d/motd.sh
 
-# ubuntuユーザーの設定
-RUN echo "ubuntu ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
+# ubuntuユーザーの作成と設定
+RUN useradd -m -s /bin/bash -u 1000 ubuntu || true && \
+    echo "ubuntu ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
     echo 'alias ll="ls -l"' >> /home/ubuntu/.bashrc
 
 # ユーザーをdockerグループに追加
 RUN usermod -aG docker ubuntu
 
-# Voltaのインストール
+# ユーザーを ubuntu に切り替える
 USER ubuntu
-RUN curl https://get.volta.sh | bash
-ENV PATH="/home/ubuntu/.volta/bin:$PATH"
-
-# NodeとYarnの最新バージョンをインストール
-RUN volta install node@22.4.0 && \
-    volta install yarn@4.3.1
-
-# .bashrcにスクリプトをソースするように追加
-RUN echo 'source /etc/profile.d/motd.sh' >> /home/ubuntu/.bashrc

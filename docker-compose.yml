@@ -1,16 +1,47 @@
+version: "3"
 services:
-  # Ubuntu24.04
   devcontainer:
     build:
       context: .
       dockerfile: docker/Dockerfile
-    container_name: devcontainer_ubuntu
+    container_name: ubuntu
     volumes:
       - ..:/workspace:cached
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./.devcontainer/logs:/var/log/devcontainer
     privileged: true
     command: sleep infinity
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  ubuntu_mysql:
+    image: mysql:8.0
+    container_name: ubuntu_mysql
+    platform: linux/amd64
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: laravel
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: laravel
+    ports:
+      - "3306:3306"
+    volumes:
+      - db-store:/var/lib/mysql
+      - ./docker/logs/mysql:/var/log/mysql
+      - ./docker/mysql/conf.d/custom.cnf:/etc/mysql/conf.d/custom.cnf
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      timeout: 20s
+      retries: 10
+      interval: 30s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
 volumes:
-  vendor:
-    driver: local
+  db-store:

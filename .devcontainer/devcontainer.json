@@ -1,5 +1,5 @@
 {
-    "name": "Custom Ubuntu 24.04",
+    "name": "Ubuntu 24.04",
     "dockerComposeFile": "../docker-compose.yml",
     "service": "devcontainer",
     "customizations": {
@@ -21,6 +21,6 @@
     ],
     "remoteUser": "ubuntu",
     "workspaceFolder": "/workspace/devcontainer_ubuntu",
-    "postCreateCommand": "/bin/sh postCreateCommand.sh",
-    "postStartCommand": "/bin/sh postStartCommand.sh"
+    "postCreateCommand": "/bin/bash postCreateCommand.sh",
+    "postStartCommand": "/bin/bash postStartCommand.sh"
 }
